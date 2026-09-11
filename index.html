@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste de Usabilidade — Portal Unyleya</title>
+<style>
+  :root{
+    --bg:#F6F4EF;
+    --surface:#FFFFFF;
+    --ink:#1F2430;
+    --ink-soft:#5B6270;
+    --line:#DDD8CC;
+    --primary:#2E4057;
+    --primary-dark:#1C2C3F;
+    --accent:#A67C3D;
+    --success:#6B8F71;
+    --danger:#B14A3D;
+    --font-serif: "Iowan Old Style","Palatino Linotype", Georgia, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-sans);
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  header.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    border-bottom:1px solid var(--line);
+    padding-bottom:16px;
+    margin-bottom:28px;
+  }
+  header.top .brand{
+    font-family:var(--font-serif);
+    font-size:15px;
+    letter-spacing:0.02em;
+    color:var(--primary-dark);
+  }
+  header.top .step-count{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .progress-track{
+    height:2px;
+    background:var(--line);
+    margin-bottom:36px;
+    position:relative;
+  }
+  .progress-fill{
+    height:2px;
+    background:var(--accent);
+    transition:width .35s ease;
+  }
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fade .3s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .num{
+    font-family:var(--font-serif);
+    font-size:40px;
+    color:var(--line);
+    line-height:1;
+    margin-bottom:4px;
+  }
+  h1.section-title{
+    font-family:var(--font-serif);
+    font-weight:400;
+    font-size:26px;
+    margin:0 0 6px;
+    color:var(--primary-dark);
+  }
+  p.section-sub{
+    color:var(--ink-soft);
+    margin:0 0 28px;
+    font-size:15px;
+    max-width:60ch;
+  }
+  .task-box{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:3px solid var(--primary);
+    padding:16px 18px;
+    margin-bottom:28px;
+    font-size:15px;
+  }
+  .task-box .label{
+    display:block;
+    font-size:12px;
+    color:var(--primary);
+    margin-bottom:6px;
+  }
+
+  fieldset{
+    border:none;
+    padding:0;
+    margin:0 0 26px;
+  }
+  legend, label.q{
+    display:block;
+    font-size:15px;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  .options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .opt{
+    position:relative;
+  }
+  .opt input{
+    position:absolute;
+    opacity:0;
+    width:100%;
+    height:100%;
+    cursor:pointer;
+    margin:0;
+  }
+  .opt span{
+    display:inline-block;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    font-size:14px;
+    color:var(--ink);
+    background:var(--surface);
+    transition:.15s;
+  }
+  .opt input:checked + span{
+    border-color:var(--primary);
+    background:var(--primary);
+    color:#fff;
+  }
+  .opt input:focus-visible + span{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  textarea, input[type=text]{
+    width:100%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    padding:12px;
+    font-family:var(--font-sans);
+    font-size:15px;
+    color:var(--ink);
+    resize:vertical;
+    min-height:80px;
+  }
+  textarea:focus, input[type=text]:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+    border-color:var(--accent);
+  }
+
+  .nav{
+    display:flex;
+    justify-content:space-between;
+    margin-top:36px;
+  }
+  button{
+    font-family:var(--font-sans);
+    font-size:14px;
+    padding:12px 22px;
+    border:1px solid var(--primary);
+    background:var(--primary);
+    color:#fff;
+    cursor:pointer;
+    transition:.15s;
+  }
+  button:hover{ background:var(--primary-dark); }
+  button.ghost{
+    background:transparent;
+    color:var(--primary);
+  }
+  button.ghost:hover{ background:rgba(46,64,87,0.08); }
+  button:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .review-item{
+    border-bottom:1px solid var(--line);
+    padding:12px 0;
+    font-size:14px;
+  }
+  .review-item .q{ color:var(--ink-soft); margin-bottom:3px; }
+  .review-item .a{ color:var(--ink); }
+
+  .status-msg{
+    margin-top:20px;
+    padding:14px 16px;
+    font-size:14px;
+    border-left:3px solid var(--success);
+    background:#EFF3EF;
+    display:none;
+  }
+  .status-msg.error{
+    border-left-color:var(--danger);
+    background:#F5EBE9;
+  }
+  .status-msg.show{ display:block; }
+
+  .consent{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .consent input{ margin-top:3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">Portal Unyleya — Teste de Usabilidade</div>
+    <div class="step-count" id="stepCount">Passo 1 de 7</div>
+  </header>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:14%"></div></div>
+
+  <form id="form">
+
+    <!-- PASSO 0: INTRODUÇÃO -->
+    <section class="panel active" data-step="0">
+      <div class="num">·</div>
+      <h1 class="section-title">Antes de começar</h1>
+      <p class="section-sub">Este teste avalia a facilidade de uso de um protótipo, não os seus conhecimentos. Não existem respostas certas ou erradas. Suas respostas são anônimas e usadas apenas para fins acadêmicos.</p>
+      <label class="consent">
+        <input type="checkbox" id="consent" required>
+        <span>Li e concordo em participar voluntariamente deste teste de usabilidade.</span>
+      </label>
+    </section>
+
+    <!-- PASSO 1: PERFIL -->
+    <section class="panel" data-step="1">
+      <div class="num">01</div>
+      <h1 class="section-title">Perfil do participante</h1>
+      <p class="section-sub">Algumas perguntas rápidas sobre seus hábitos de estudo.</p>
+
+      <fieldset>
+        <legend class="q">Você já utilizou alguma plataforma de ensino a distância (EAD)?</legend>
+        <div class="options" data-name="usaEad">
+          <label class="opt"><input type="radio" name="usaEad" value="Sim" required><span>Sim</span></label>
+          <label class="opt"><input type="radio" name="usaEad" value="Não"><span>Não</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">Com que frequência assiste a videoaulas?</legend>
+        <div class="options" data-name="frequencia">
+          <label class="opt"><input type="radio" name="frequencia" value="Diariamente" required><span>Diariamente</span></label>
+          <label class="opt"><input type="radio" name="frequencia" value="Algumas vezes por semana"><span>Algumas vezes/semana</span></label>
+          <label class="opt"><input type="radio" name="frequencia" value="Raramente"><span>Raramente</span></label>
+          <label class="opt"><input type="radio" name="frequencia" value="Nunca"><span>Nunca</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <label class="q" for="lembraOnde">Como você normalmente lembra onde parou em uma aula?</label>
+        <textarea id="lembraOnde" name="lembraOnde" required></textarea>
+      </fieldset>
+    </section>
+
+    <!-- PASSO 2: TAREFA 1 -->
+    <section class="panel" data-step="2">
+      <div class="num">02</div>
+      <h1 class="section-title">Tarefa 1</h1>
+      <div class="task-box">
+        <span class="label">Instrução</span>
+        Você já assistiu a algumas aulas e voltou à plataforma. Mostre como identificaria quais aulas já foram assistidas.
+      </div>
+
+      <fieldset>
+        <legend class="q">Conseguiu realizar a tarefa?</legend>
+        <div class="options" data-name="t1Sucesso">
+          <label class="opt"><input type="radio" name="t1Sucesso" value="Sim, sem ajuda" required><span>Sim, sem ajuda</span></label>
+          <label class="opt"><input type="radio" name="t1Sucesso" value="Sim, com dificuldade"><span>Sim, com dificuldade</span></label>
+          <label class="opt"><input type="radio" name="t1Sucesso" value="Não conseguiu"><span>Não conseguiu</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">Foi fácil identificar as aulas assistidas?</legend>
+        <div class="options" data-name="t1Dificuldade">
+          <label class="opt"><input type="radio" name="t1Dificuldade" value="Muito fácil" required><span>Muito fácil</span></label>
+          <label class="opt"><input type="radio" name="t1Dificuldade" value="Fácil"><span>Fácil</span></label>
+          <label class="opt"><input type="radio" name="t1Dificuldade" value="Neutro"><span>Neutro</span></label>
+          <label class="opt"><input type="radio" name="t1Dificuldade" value="Difícil"><span>Difícil</span></label>
+          <label class="opt"><input type="radio" name="t1Dificuldade" value="Muito difícil"><span>Muito difícil</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <label class="q" for="t1Motivo">O que facilitou ou dificultou?</label>
+        <textarea id="t1Motivo" name="t1Motivo" required></textarea>
+      </fieldset>
+    </section>
+
+    <!-- PASSO 3: TAREFA 2 -->
+    <section class="panel" data-step="3">
+      <div class="num">03</div>
+      <h1 class="section-title">Tarefa 2</h1>
+      <div class="task-box">
+        <span class="label">Instrução</span>
+        Imagine que você ficou alguns dias sem estudar. Mostre como retomaria seus estudos de onde parou.
+      </div>
+
+      <fieldset>
+        <legend class="q">Conseguiu identificar onde deveria continuar?</legend>
+        <div class="options" data-name="t2Identificou">
+          <label class="opt"><input type="radio" name="t2Identificou" value="Sim, sem ajuda" required><span>Sim, sem ajuda</span></label>
+          <label class="opt"><input type="radio" name="t2Identificou" value="Sim, com dificuldade"><span>Sim, com dificuldade</span></label>
+          <label class="opt"><input type="radio" name="t2Identificou" value="Não conseguiu"><span>Não conseguiu</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">A opção de continuar os estudos ficou clara?</legend>
+        <div class="options" data-name="t2Clareza">
+          <label class="opt"><input type="radio" name="t2Clareza" value="Sim" required><span>Sim</span></label>
+          <label class="opt"><input type="radio" name="t2Clareza" value="Parcialmente"><span>Parcialmente</span></label>
+          <label class="opt"><input type="radio" name="t2Clareza" value="Não"><span>Não</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <label class="q" for="t2Dificuldade">Teve alguma dificuldade? Qual?</label>
+        <textarea id="t2Dificuldade" name="t2Dificuldade" required></textarea>
+      </fieldset>
+    </section>
+
+    <!-- PASSO 4: TAREFA 3 -->
+    <section class="panel" data-step="4">
+      <div class="num">04</div>
+      <h1 class="section-title">Tarefa 3</h1>
+      <div class="task-box">
+        <span class="label">Instrução</span>
+        Encontre uma videoaula que ainda não foi assistida e inicie a aula.
+      </div>
+
+      <fieldset>
+        <legend class="q">Foi fácil encontrar uma aula não assistida?</legend>
+        <div class="options" data-name="t3Facilidade">
+          <label class="opt"><input type="radio" name="t3Facilidade" value="Muito fácil" required><span>Muito fácil</span></label>
+          <label class="opt"><input type="radio" name="t3Facilidade" value="Fácil"><span>Fácil</span></label>
+          <label class="opt"><input type="radio" name="t3Facilidade" value="Neutro"><span>Neutro</span></label>
+          <label class="opt"><input type="radio" name="t3Facilidade" value="Difícil"><span>Difícil</span></label>
+          <label class="opt"><input type="radio" name="t3Facilidade" value="Muito difícil"><span>Muito difícil</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">Conseguiu iniciar a aula sem ajuda?</legend>
+        <div class="options" data-name="t3Iniciou">
+          <label class="opt"><input type="radio" name="t3Iniciou" value="Sim" required><span>Sim</span></label>
+          <label class="opt"><input type="radio" name="t3Iniciou" value="Não"><span>Não</span></label>
+        </div>
+      </fieldset>
+    </section>
+
+    <!-- PASSO 5: AVALIAÇÃO FINAL -->
+    <section class="panel" data-step="5">
+      <div class="num">05</div>
+      <h1 class="section-title">Avaliação final</h1>
+
+      <fieldset>
+        <legend class="q">De 1 a 5, quão fácil foi utilizar o protótipo?</legend>
+        <div class="options" data-name="notaFinal">
+          <label class="opt"><input type="radio" name="notaFinal" value="1" required><span>1</span></label>
+          <label class="opt"><input type="radio" name="notaFinal" value="2"><span>2</span></label>
+          <label class="opt"><input type="radio" name="notaFinal" value="3"><span>3</span></label>
+          <label class="opt"><input type="radio" name="notaFinal" value="4"><span>4</span></label>
+          <label class="opt"><input type="radio" name="notaFinal" value="5"><span>5</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">Qual tarefa foi mais fácil?</legend>
+        <div class="options" data-name="tarefaFacil">
+          <label class="opt"><input type="radio" name="tarefaFacil" value="Tarefa 1" required><span>Tarefa 1</span></label>
+          <label class="opt"><input type="radio" name="tarefaFacil" value="Tarefa 2"><span>Tarefa 2</span></label>
+          <label class="opt"><input type="radio" name="tarefaFacil" value="Tarefa 3"><span>Tarefa 3</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">Qual tarefa foi mais difícil?</legend>
+        <div class="options" data-name="tarefaDificil">
+          <label class="opt"><input type="radio" name="tarefaDificil" value="Tarefa 1" required><span>Tarefa 1</span></label>
+          <label class="opt"><input type="radio" name="tarefaDificil" value="Tarefa 2"><span>Tarefa 2</span></label>
+          <label class="opt"><input type="radio" name="tarefaDificil" value="Tarefa 3"><span>Tarefa 3</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <label class="q" for="mudaria">O que você mudaria na plataforma?</label>
+        <textarea id="mudaria" name="mudaria" required></textarea>
+      </fieldset>
+
+      <fieldset>
+        <legend class="q">Recomendaria essa forma de navegação a outro estudante?</legend>
+        <div class="options" data-name="recomendaria">
+          <label class="opt"><input type="radio" name="recomendaria" value="Sim" required><span>Sim</span></label>
+          <label class="opt"><input type="radio" name="recomendaria" value="Talvez"><span>Talvez</span></label>
+          <label class="opt"><input type="radio" name="recomendaria" value="Não"><span>Não</span></label>
+        </div>
+      </fieldset>
+    </section>
+
+    <!-- PASSO 6: REVISÃO -->
+    <section class="panel" data-step="6">
+      <div class="num">·</div>
+      <h1 class="section-title">Revisar e enviar</h1>
+      <p class="section-sub">Confira suas respostas antes de enviar.</p>
+      <div id="reviewList"></div>
+      <div class="status-msg" id="statusMsg"></div>
+    </section>
+
+    <div class="nav">
+      <button type="button" class="ghost" id="backBtn">Voltar</button>
+      <button type="button" id="nextBtn">Próximo</button>
+    </div>
+  </form>
+</div>
+
+<script>
+// ⚠️ Substitua pela URL do seu Web App do Google Apps Script (ver instruções)
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbykvuTcdKl4QCPe4f3AwTyz5nq9Ku25V_9WnPIlYT3wQrLNGHlbgTjuUdEBoiRnDzaOag/exec";
+
+const panels = Array.from(document.querySelectorAll('.panel'));
+const total = panels.length;
+let current = 0;
+
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progressFill = document.getElementById('progressFill');
+const stepCount = document.getElementById('stepCount');
+
+const questionLabels = {
+  usaEad: "Já utilizou EAD?",
+  frequencia: "Frequência de videoaulas",
+  lembraOnde: "Como lembra onde parou",
+  t1Sucesso: "Tarefa 1 — Conseguiu realizar?",
+  t1Dificuldade: "Tarefa 1 — Dificuldade",
+  t1Motivo: "Tarefa 1 — O que facilitou/dificultou",
+  t2Identificou: "Tarefa 2 — Identificou onde continuar?",
+  t2Clareza: "Tarefa 2 — Opção clara?",
+  t2Dificuldade: "Tarefa 2 — Dificuldade relatada",
+  t3Facilidade: "Tarefa 3 — Facilidade em encontrar",
+  t3Iniciou: "Tarefa 3 — Iniciou sem ajuda?",
+  notaFinal: "Nota final (1-5)",
+  tarefaFacil: "Tarefa mais fácil",
+  tarefaDificil: "Tarefa mais difícil",
+  mudaria: "O que mudaria",
+  recomendaria: "Recomendaria?"
+};
+
+function updateNav(){
+  progressFill.style.width = ((current)/(total-1)*100) + '%';
+  stepCount.textContent = `Passo ${current+1} de ${total}`;
+  backBtn.style.visibility = current === 0 ? 'hidden' : 'visible';
+  nextBtn.textContent = current === total - 1 ? 'Enviar respostas' : (current === total - 2 ? 'Revisar' : 'Próximo');
+}
+
+function validateCurrent(){
+  const panel = panels[current];
+  const inputs = panel.querySelectorAll('input, textarea');
+  for (const el of inputs){
+    if (el.type === 'radio'){
+      const group = panel.querySelectorAll(`input[name="${el.name}"]`);
+      const checked = Array.from(group).some(r => r.checked);
+      if (!checked){ return false; }
+    } else if (el.type === 'checkbox' && el.required && !el.checked){
+      return false;
+    } else if (el.tagName === 'TEXTAREA' && el.required && !el.value.trim()){
+      return false;
+    }
+  }
+  return true;
+}
+
+function buildReview(){
+  const list = document.getElementById('reviewList');
+  list.innerHTML = '';
+  const data = new FormData(document.getElementById('form'));
+  for (const [key, label] of Object.entries(questionLabels)){
+    const val = data.get(key) || '—';
+    const item = document.createElement('div');
+    item.className = 'review-item';
+    item.innerHTML = `<div class="q">${label}</div><div class="a">${val}</div>`;
+    list.appendChild(item);
+  }
+}
+
+function showPanel(i){
+  panels.forEach((p, idx) => p.classList.toggle('active', idx === i));
+  if (i === total - 1) buildReview();
+  updateNav();
+}
+
+nextBtn.addEventListener('click', async () => {
+  if (current < total - 1){
+    if (!validateCurrent()){
+      alert('Por favor, responda todas as perguntas desta seção.');
+      return;
+    }
+    current++;
+    showPanel(current);
+  } else {
+    await submitForm();
+  }
+});
+
+backBtn.addEventListener('click', () => {
+  if (current > 0){
+    current--;
+    showPanel(current);
+  }
+});
+
+async function submitForm(){
+  const statusMsg = document.getElementById('statusMsg');
+  nextBtn.disabled = true;
+  nextBtn.textContent = 'Enviando...';
+
+  const data = Object.fromEntries(new FormData(document.getElementById('form')).entries());
+  data.timestamp = new Date().toISOString();
+
+  try{
+    if (WEBAPP_URL.startsWith('http')){
+      await fetch(WEBAPP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(data)
+      });
+    }
+    statusMsg.textContent = 'Respostas enviadas com sucesso. Obrigado pela participação!';
+    statusMsg.className = 'status-msg show';
+    nextBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+  } catch(err){
+    statusMsg.textContent = 'Não foi possível enviar automaticamente. Verifique a URL do Apps Script.';
+    statusMsg.className = 'status-msg show error';
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Tentar novamente';
+  }
+}
+
+updateNav();
+</script>
+</body>
+</html>
